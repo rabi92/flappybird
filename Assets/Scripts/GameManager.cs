@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
-    [SerializeField]
-    float game_speed;
+
+    public static GameManager instance;
+    public float game_speed;
 
     public bool isPaused = true;
     public bool isGameOver = false;
@@ -20,12 +22,23 @@ public class GameManager : MonoBehaviour {
 
     [SerializeField]
     Bird_Controller bird;
-	// Use this for initialization
-	void Start () {
+
+    [SerializeField]
+    Obstacle_Pool obstacles;
+
+    private void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else if (instance != this)
+            Destroy(gameObject);
+
+    }
+
+    void Start () {
         Time.timeScale = 0f;
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.Escape))
         {
@@ -35,10 +48,10 @@ public class GameManager : MonoBehaviour {
 
     public void StartGame()
     {
-        //disable menu
         menu.SetActive(false);
         Time.timeScale = 1f;
         isPaused = false;
+        isGameOver = false;
     }
 
     public void UpdateScore()
@@ -55,27 +68,25 @@ public class GameManager : MonoBehaviour {
 
     public void PauseGame()
     {
-        print("Pause Button Pressed!");
-        //pause game
         isPaused = true;
         Time.timeScale = 0f;
     }
 
     public void GameOver()
     {
-        //Show Gameover UI
         gameoverUI.SetActive(true);
         pauseButton.SetActive(false);
+        isGameOver = true;
     }
 
     public void Restart()
     {
-        bird.transform.position = Vector3.zero;
-        //reset bird y
-        //reset obstacles
-        //reset score
-
-        //update booleans
+        bird.ResetBird();
+        pauseButton.SetActive(true);
+        isGameOver = false;
+        score = 0;
+        scoreField.text = score.ToString();
+        obstacles.ResetObstacles();
 
     }
 

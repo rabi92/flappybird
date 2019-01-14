@@ -11,36 +11,38 @@ public class Bird_Controller : MonoBehaviour {
 
     Rigidbody2D birdRigidbody;
 
-    [SerializeField]
-    GameManager gameManager;
-	// Use this for initialization
-	void Start () {
+	
+    void Start () {
         birdRigidbody =  GetComponent<Rigidbody2D>();
 	}
+
+    public void ResetBird()
+    {
+        transform.position = Vector2.zero;
+        transform.rotation = Quaternion.identity;
+        birdRigidbody.velocity = Vector2.zero;
+        birdRigidbody.angularVelocity = 0f;
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //Game Over
-        gameover = true;
+        GameManager.instance.GameOver();
     }
 
-    public void Jump()
+   
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(!gameover && !gameManager.isPaused)
-        {
-            //birdRigidbody.velocity = Vector2.zero;
-            //birdRigidbody.AddForce(jump_force * 100f * Vector2.up);
-        }
+        if(collision.gameObject.tag == "Obstacle")
+            GameManager.instance.UpdateScore();
+
     }
     // Update is called once per frame
     void Update () {
-		if(!gameover)
-        {
-            if(Input.GetMouseButtonDown(0) && !gameManager.isPaused)
+            if(!GameManager.instance.isGameOver && !GameManager.instance.isPaused && Input.GetMouseButtonDown(0) )
             {
                 birdRigidbody.velocity = Vector2.zero;
                 birdRigidbody.AddForce(jump_force * 100f * Vector2.up);
             }
         }
-    }
 }
